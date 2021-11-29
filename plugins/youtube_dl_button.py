@@ -148,10 +148,6 @@ async def youtube_dl_call_back(bot, update):
     process = await asyncio.create_subprocess_exec(
         *command_to_exec,
         # stdout must a pipe to be accessible as process.stdout
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
- 
     stdout, stderr = await process.communicate()
     e_response = stderr.decode().strip()
     t_response = stdout.decode().strip()

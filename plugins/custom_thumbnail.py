@@ -62,7 +62,7 @@ async def Gthumb01(bot, update):
         Image.open(thumbnail).convert("RGB").save(thumbnail)
         img = Image.open(thumbnail)
         img.resize((100, 100))
-        img.save(thumbnail, "JPEG")
+        img.save(thumbnail, "JPG")
     else:
         thumbnail = None
 

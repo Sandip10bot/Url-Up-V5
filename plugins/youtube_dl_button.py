@@ -139,8 +139,19 @@ async def youtube_dl_call_back(bot, update):
         command_to_exec.append("--username")
         command_to_exec.append(youtube_dl_username)
     if youtube_dl_password is not None:
-        command_to_exec.append("--password
+        pend("--password")
+        command_to_exec.append(youtube_dl_password)
+    command_to_exec.append("--no-warnings")
+    # command_to_exec.append("--quiet")
+    logger.info(command_to_exec)
+    start = datetime.now()
+    process = await asyncio.create_subprocess_exec(
+        *command_to_exec,
+        # stdout must a pipe to be accessible as process.stdout
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
+ 
     stdout, stderr = await process.communicate()
     e_response = stderr.decode().strip()
     t_response = stdout.decode().strip()

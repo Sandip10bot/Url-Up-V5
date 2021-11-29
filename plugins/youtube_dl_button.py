@@ -143,7 +143,53 @@ async def youtube_dl_call_back(bot, update):
     if "hotstar" in youtube_dl_url:
         command_to_exec.append("--geo-bypass-country")
         command_to_exec.append("IN")
-NUlL
+     start = datetime.now()
+    process = await asyncio.create_subprocess_exec(
+        *command_to_exec,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    e_response = stderr.decode().strip()
+    t_response = stdout.decode().strip()
+    # logger.info(e_response)
+    # logger.info(t_response)
+    ad_string_to_replace = "please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output."
+    if e_response and ad_string_to_replace in e_response:
+        error_message = e_response.replace(ad_string_to_replace, "")
+        await bot.edit_message_text(
+            chat_id=update.message.chat.id,
+            message_id=update.message.message_id,
+            text=error_message
+        )
+        return False
+    if t_response:
+        try:
+            os.remove(save_ytdl_json_path)
+        except:
+            pass
+        end_one = datetime.now()
+        time_taken_for_download = (end_one -start).seconds
+        file_size = Config.TG_MAX_FILE_SIZE + 1
+        try:
+            file_size = os.stat(download_directory).st_size
+        except FileNotFoundError as exc:
+            try:
+                download_directory = os.path.splitext(download_directory)[0] + "." + "mkv"
+                file_size = os.stat(download_directory).st_size
+            except Exception as e:
+                await bot.edit_message_text(
+                    chat_id=update.message.chat.id,
+                    text="Some errors occured while downloading video!",
+                    message_id=update.message.message_id
+                )
+                logger.info("FnF error - " + str(e))
+                return
+        if file_size > Config.TG_MAX_FILE_SIZE:
+            await bot.edit_message_text(
+                chat_id=update.message.chat.id,
+                text=Translation.RCHD_TG_API_LIMIT.format(time_taken_for_download, humanbytes(file_size)),
+                message_id=update.message.message_id
             )
         else:
             await bot.edit_message_text(
